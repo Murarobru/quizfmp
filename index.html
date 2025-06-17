@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>QUIZ FMP</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="font-sans">
+    <div class="container mx-auto px-4 py-8 flex flex-col min-h-screen">
+        <!-- Cabeçalho -->
+        <header class="text-center mb-6">
+            <h1 class="text-9xl font-bold text-[#1D396C] mt-8 text-center arial">
+       QUIZ
+             </h1>
+
+        </header>
+
+        <!-- Tela inicial -->
+        <div id="startScreen" class="flex-1 flex flex-col items-center justify-center">
+            <div class="glass-container p-8 md:p-10 text-center max-w-lg w-full fade-in">
+                <h2 class="text-2xl md:text-3xl font-bold text-gray-800 mb-8">Você está preparado?</h2>
+                <button id="startQuizBtn" class="btn-primary text-lg"
+                style="background-color: #1D396C;">
+            
+                    Vamos lá!
+                </button>
+            </div>
+        </div>
+        
+
+        <!-- Container do Quiz (inicialmente oculto) -->
+        <div id="quizContainer" class="flex-1 flex flex-col items-center justify-center hidden">
+            <!-- Barra de progresso -->
+            <div class="w-full max-w-3xl mb-6 bg-gray-200 rounded-full h-2.5 overflow-hidden">
+                <div id="progressBar" class="progress-bar bg-indigo-600 h-2.5 rounded-full" style="width: 5%"></div>
+            </div>
+            
+            <!-- Contador de perguntas -->
+            <div class="w-full max-w-3xl mb-4 flex justify-between items-center">
+                <span id="questionCounter" class="text-white font-bold text-lg bg-indigo-600/80 backdrop-blur-sm px-4 py-1 rounded-full"
+                style="background-color: #1D396C;">
+                >
+                    Pergunta 1/20
+                </span>
+                <span id="scoreDisplay" class="text-white font-bold text-lg bg-green-600/80 backdrop-blur-sm px-4 py-1 rounded-full">
+                    Pontuação: 0
+                </span>
+            </div>
+            
+            <!-- Container da pergunta -->
+            <div id="questionBox" class="question-container w-full max-w-3xl p-6 md:p-8 rounded-xl shadow-xl mb-6 fade-in">
+                <h2 id="questionText" class="text-xl md:text-2xl font-bold text-gray-800 mb-6">Pergunta aparecerá aqui</h2>
+                
+                <div id="optionsContainer" class="space-y-4">
+                    <!-- Opções serão inseridas aqui -->
+                </div>
+            </div>
+            
+            <!-- Botão de navegação -->
+            <div class="w-full max-w-3xl flex justify-between">
+                <button id="prevBtn" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg shadow-md transition-all hidden"
+                style="background-color: #1D396C;">
+                
+                    Anterior
+                </button>
+                <div class="flex-grow"></div>
+                <button id="nextBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed" disabled
+                    style="background-color: #1D396C;">
+        
+                    Próxima
+                </button>
+            </div>
+        </div>
+
+        <!-- Tela de resultados (inicialmente oculta) -->
+        <div id="resultsContainer" class="flex-1 flex flex-col items-center justify-center hidden fade-in">
+            <div class="question-container w-full max-w-3xl p-8 rounded-xl shadow-xl text-center">
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">Resultado Final</h2>
+                <p id="finalScore" class="text-2xl mb-6">Você acertou <span class="font-bold text-indigo-600">0</span> de 21 perguntas!</p>
+                <div id="scorePercentage" class="w-full bg-gray-200 rounded-full h-6 mb-6">
+                    <div class="bg-indigo-600 h-6 rounded-full text-white text-sm font-bold flex items-center justify-center" style="width: 0%">0%</div>
+                </div>
+                <p id="resultMessage" class="text-xl mb-8">Mensagem baseada no desempenho</p>
+                <button id="restartBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg shadow-md transition-all">
+                    Reiniciar Quiz
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const courseQuestion = {
+                question: "Antes de iniciar as perguntas do Quiz, responda: Qual é o seu curso?",
+                options: ["Administração","Análise e Desenvolvimento de Sistemas","Pedagogia","Processos Gerenciais"
+  ]
+  // Não precisa de resposta correta nem pontuação
+};
+        // Banco de perguntas
+        const questions = [
+            
+            {
+                question: "Quais os turnos dos cursos (ADM, ADS, PEDAGOGIA E PG) na FMP?",
+                options: ["Manhã e tarde", "Manhã e noite", "Tarde e noite"],
+                correctAnswer: 1
+            },
+            {
+                question: "Qual éo nome da Diretora Executiva?",
+                options: ["Andréia Raquel Schutz", "Débora Andréia Schutz", "Débora Raquel Schutz"],
+                correctAnswer: 2
+            },
+            {
+                question: "O que significa CPA?",
+                options: ["Comissão Para Avaliação", "Comissão Própria de Avaliação", "Comissão Participativa de Avaliação"],
+                correctAnswer: 1
+            },
+            {
+                question: "Qual é o Instagram da Faculdade?",
+                options: ["@FMPOFICIAL", "@faculdademunicipaldepalhoca", "@FMPPalhoca"],
+                correctAnswer: 1
+            },
+            {
+                question: "A faculdade oferece cursos de pós graduação?",
+                options: ["Sim", "Não"],
+                correctAnswer: 0
+            },
+            {
+                question: "Qual é o nome da feira que ocorre na FMP, em parceria com a Empresa Júnior FMP?",
+                options: ["Feira do Empreendedor", "Feira do Empreendedorismo", "Feira para Empreender"],
+                correctAnswer: 0
+            },
+            {
+                question: "Qual é a principal forma de ingresso na FMP nos cursos de graduação?",
+                options: ["Nota do Enem", "Ordem de inscrição", "Vestibular"],
+                correctAnswer: 2
+            },
+            {
+                question: "O que significa ILAB?",
+                options: ["Incentivo Laboratório", "Laboratório de Inovação e Empreendedorismo", "Laboratório de Inovação"],
+                correctAnswer: 1
+            },
+            {
+                question: "Qual a maior nota (atualmente) atribuida pelo MEC em um ou mais cursos da FMP?",
+                options: ["4", "3", "5"],
+                correctAnswer: 0
+            },
+            {
+                question: "Em qual bairro está localizada a FMP",
+                options: ["Passa vinte", "Ponte do Imaruim", "Bela Vista"],
+                correctAnswer: 1
+            },
+            {
+                question: "Qual o site da Faculdade?",
+                options: ["fmp.edu.br", "fmp.com.br", "fmp.edu.gov.br"],
+                correctAnswer: 0
+            },
+            {
+                question: "Qual a cor predominante na logo da FMP?",
+                options: ["Azul", "Amarelo", "Bege"],
+                correctAnswer: 0
+            },
+            {
+                question: "Qual curso de gradução está indisponivel?",
+                options: ["Processos Gerenciais", "Gestão de Turismo", "Gestão Empresarial"],
+                correctAnswer: 1
+            },
+            {
+                question: "Quais cursos de graduação ocorrem pela manhã?",
+                options: ["ADS E PG", "ADM E PEDAGOGIA", "PG E PEDAGOGIA"],
+                correctAnswer: 0
+            },
+            {
+                question: "Quais cursos de graduação ocorrem no período da noite?",
+                options: ["ADM E PEDAGOGIA", "ADS E PEDAGOGIA", "ADM E PG"],
+                correctAnswer: 0
+            },
+            {
+                question: "Quantos cursos superiores (não considerar pós) há atualmente?",
+                options: ["3", "4", "5"],
+                correctAnswer: 1
+            },
+            {
+                question: "Qual é o nome da primeira diretora da FMP?",
+                options: ["Mariléia Silva da Costa", "Mariléia Costa da Silva", "Mariléia Silveira da Costa"],
+                correctAnswer: 2
+            },
+            {
+                question: "Qual foi o ano de inaguração da faculdade?",
+                options: ["2005", "2006", "2007"],
+                correctAnswer: 1
+            },
+            {
+                question: "Onde funcionou a FMP no inicio das suas atividades acadêmicas?",
+                options: ["SESC", "SENAI", "CAIC"],
+                correctAnswer: 2
+            },
+            {
+                question: "Qual é orgão responsável pela manutenção da FMP?",
+                options: ["Estado de SC", "Iniciativa Privada", "Prefeitura de Palhoça"],
+                correctAnswer: 2
+            }
+        ];
+
+        let currentQuestionIndex = -1;
+        let score = 0;
+        let selectedOption = null;
+
+        // Elementos DOM
+        const startScreen = document.getElementById('startScreen');
+        const quizContainer = document.getElementById('quizContainer');
+        const resultsContainer = document.getElementById('resultsContainer');
+        const startQuizBtn = document.getElementById('startQuizBtn');
+        const questionText = document.getElementById('questionText');
+        const optionsContainer = document.getElementById('optionsContainer');
+        const nextBtn = document.getElementById('nextBtn');
+        const prevBtn = document.getElementById('prevBtn');
+        const questionCounter = document.getElementById('questionCounter');
+        const scoreDisplay = document.getElementById('scoreDisplay');
+        const progressBar = document.getElementById('progressBar');
+        const finalScore = document.getElementById('finalScore');
+        const scorePercentage = document.getElementById('scorePercentage').firstElementChild;
+        const resultMessage = document.getElementById('resultMessage');
+        const restartBtn = document.getElementById('restartBtn');
+
+        // Iniciar o quiz
+        startQuizBtn.addEventListener('click', () => {
+            startScreen.classList.add('hidden');
+            quizContainer.classList.remove('hidden');
+            loadQuestion();
+        });
+
+        // Reiniciar o quiz
+        restartBtn.addEventListener('click', () => {
+            currentQuestionIndex = -1;
+            score = 0;
+            selectedOption = null;
+            resultsContainer.classList.add('hidden');
+            startScreen.classList.remove('hidden');
+            scoreDisplay.textContent = `Pontuação: ${score}`;
+            progressBar.style.width = `5%`;
+            nextBtn.disabled = true;
+            prevBtn.classList.add('hidden');
+        });
+
+        // Botão Próxima pergunta
+        nextBtn.addEventListener('click', () => {
+    if (selectedOption === null) return;
+
+    // Se estiver na pergunta do curso, só pula para a primeira pergunta, sem somar pontos
+    if (currentQuestionIndex === -1) {
+        currentQuestionIndex = 0; // vai para a primeira pergunta
+        selectedOption = null; // reseta a seleção
+        loadQuestion();
+        nextBtn.disabled = true; // desabilita até escolher opção
+        return;
+    }
+
+    // Para as perguntas normais, checa resposta e avança normalmente
+    checkAnswer();
+    currentQuestionIndex++;
+    if (currentQuestionIndex >= questions.length) {
+        showResults();
+    } else {
+        loadQuestion();
+    }
+});
+
+
+        // Botão Pergunta anterior
+        prevBtn.addEventListener('click', () => {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                loadQuestion();
+            }
+        });
+
+        // Carregar pergunta
+    function loadQuestion() {
+        optionsContainer.innerHTML = '';
+        selectedOption = null;
+        nextBtn.disabled = true;
+
+        if (currentQuestionIndex === -1) {
+        // Pergunta do curso
+        questionText.textContent = courseQuestion.question;
+
+        courseQuestion.options.forEach((option, index) => {
+            const button = document.createElement('button');
+            button.textContent = option;
+            button.className = 'option-btn w-full text-left px-4 py-3 rounded-lg border border-gray-300 bg-white hover:bg-indigo-50 transition-colors';
+            button.addEventListener('click', () => {
+                selectOption(index, button);
+            });
+            optionsContainer.appendChild(button);
+        });
+
+        questionCounter.textContent = '';
+        scoreDisplay.textContent = '';
+        progressBar.style.width = '0%';
+        prevBtn.classList.add('hidden');
+
+        return;
+    }
+
+    // Perguntas normais
+    const currentQuestion = questions[currentQuestionIndex];
+    questionText.textContent = currentQuestion.question;
+
+    currentQuestion.options.forEach((option, index) => {
+        const button = document.createElement('button');
+        button.textContent = option;
+        button.className = 'option-btn w-full text-left px-4 py-3 rounded-lg border border-gray-300 bg-white hover:bg-indigo-50 transition-colors';
+        button.addEventListener('click', () => {
+            selectOption(index, button);
+        });
+        optionsContainer.appendChild(button);
+    });
+
+    if (currentQuestionIndex === 0) {
+        prevBtn.classList.add('hidden');
+    } else {
+        prevBtn.classList.remove('hidden');
+    }
+
+    questionCounter.textContent = `Pergunta ${currentQuestionIndex + 1}/${questions.length}`;
+    scoreDisplay.textContent = `Pontuação: ${score}`;
+    const progressPercent = (currentQuestionIndex / questions.length) * 100;
+    progressBar.style.width = `${progressPercent}%`;
+}
+
+
+            // Criar opções
+            currentQuestion.options.forEach((option, index) => {
+                const button = document.createElement('button');
+                button.textContent = option;
+                button.className = 'option-btn w-full text-left px-4 py-3 rounded-lg border border-gray-300 bg-white hover:bg-indigo-50 transition-colors';
+                button.addEventListener('click', () => {
+                    selectOption(index, button);
+                });
+                optionsContainer.appendChild(button);
+            });
+
+        // Selecionar opção
+        function selectOption(index, button) {
+            selectedOption = index;
+            nextBtn.disabled = false;
+
+            // Remover seleção anterior
+            document.querySelectorAll('.option-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+
+            button.classList.add('selected');
+        }
+
+        // Verificar resposta e atualizar pontuação
+        function checkAnswer() {
+            if (selectedOption === questions[currentQuestionIndex].correctAnswer) {
+                score++;
+            }
+        }
+
+        // Mostrar resultados
+        function showResults() {
+            quizContainer.classList.add('hidden');
+            resultsContainer.classList.remove('hidden');
+            finalScore.innerHTML = `Você acertou <span class="font-bold text-indigo-600">${score}</span> de ${questions.length} perguntas!`;
+            const percent = Math.round((score / questions.length) * 100);
+            scorePercentage.style.width = `${percent}%`;
+            scorePercentage.textContent = `${percent}%`;
+
+            let message = '';
+            if (percent === 100) {
+                message = "Parabéns! Você é filhote da FMP.";
+            } else if (percent >= 70) {
+                message = "Muito bem! Você sabe quase tudo sobre a FMP.";
+            } else if (percent >= 40) {
+                message = "É, tá sabendo alguma coisa sobre a FMP.";
+            } else {
+                message = "Você estuda mesmo na FMP? Precisa melhorar hein...";
+            }
+            resultMessage.textContent = message;
+        }
+    </script>
+<footer class="footer-container">
+  <div class="footer-content max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
+    <div class="footer-text text-sm text-gray-700">
+      &copy; 2025 Bruna Muraro - Todos os direitos reservados
+    </div>
+    <div class="footer-logo">
+      <img src="Logo ADS FMP_6.png" alt="Logo do Curso" class="h-8">
+    </div>
+  </div>
+</footer>
+
+
+</body>
+</html>
